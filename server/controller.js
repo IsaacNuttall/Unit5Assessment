@@ -240,26 +240,44 @@ module.exports = {
     },
 
     createCity: (req, res) => {
-        const{name, rating, country_id} = req.body
+        const{name, rating, countryId} = req.body
+        console.log(name, rating, countryId)
 
         sequelize.query(`
         INSERT INTO cities
-        (name, rating, country_id)
+        (name, rating, country_Id)
         VALUES
-        ('${name}', ${rating}, ${country_id})
+        ('${name}', ${rating}, ${countryId})
         RETURNING *;
         `).then(dbRes => res.status(200).send(dbRes[0]))
         .catch(theseHands => console.log(theseHands))
-    }
+    },
 
-    // getCities: (req, res) => {
-    //     sequelize.query(`
-    //     SELECT
-    //     city_id AS city,
-    //     country_id AS country
-    //     FROM cities
-    //     JOIN countries
-    //     ON country_id
-    //     `)
-    // }
+    getCities: (req, res) => {
+        sequelize.query(`
+        SELECT
+        cities.name AS city,
+        cities.city_id AS city_id,
+        countries.name AS country,
+        cities.rating AS rating
+        FROM cities
+        JOIN countries
+        ON cities.country_id = countries.country_id
+        `)
+        .then(dbRes => res.status(200).send(dbRes[0]))
+        .catch(theseHands => console.log(theseHands))
+    },
+
+    deleteCity: (req, res) => {
+        const {id} = req.params
+
+        console.log(req.params)
+
+        sequelize.query(`
+        DELETE FROM cities
+        WHERE cities.city_id = ${id};
+        `)
+        .then(dbRes => res.status(200).send(dbRes[0]))
+        .catch(theseHands => console.log(theseHands))
+    }
 }
